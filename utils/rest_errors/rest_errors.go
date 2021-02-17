@@ -1,0 +1,81 @@
+package rest_errors
+
+import "net/http"
+
+type RestError interface {
+	Message() string
+	Status() int64
+	Code() string
+}
+
+type restError struct {
+	RMessage string `json:"message"`
+	RStatus  int64  `json:"status"`
+	RCode    string `json:"code"`
+}
+
+func (re *restError) Status() int64 {
+	return re.RStatus
+}
+
+func (re *restError) Message() string {
+	return re.RMessage
+}
+
+func (re *restError) Code() string {
+	return re.RCode
+}
+
+//NewBadRequest : this method implements the bad request error
+func NewBadRequestError(message string) RestError {
+	return &restError{
+		RMessage: message,
+		RStatus:  http.StatusBadRequest,
+		RCode:    "bad_request",
+	}
+}
+
+//NewNotFoundError : this method implements the not found error
+func NewNotFoundError(message string) RestError {
+	return &restError{
+		RMessage: message,
+		RStatus:  http.StatusNotFound,
+		RCode:    "not_found",
+	}
+}
+
+//NewInternalServerError : this method implements the internal server error
+func NewInternalServerError(message string) RestError {
+	return &restError{
+		RMessage: message,
+		RStatus:  http.StatusInternalServerError,
+		RCode:    "internal_server_error",
+	}
+}
+
+//NewUnauthorizedError : this method implements the unauthorized error
+func NewUnauthorizedError(message string) RestError {
+	return &restError{
+		RMessage: message,
+		RStatus:  http.StatusUnauthorized,
+		RCode:    "unauthorized_error",
+	}
+}
+
+//TokenExpired : this will return when the token get expired
+func TokenExpired() RestError {
+	return &restError{
+		RMessage: "Token Expired",
+		RStatus:  http.StatusExpectationFailed,
+		RCode:    "token_expired",
+	}
+}
+
+//NewError : this will creates the New Error
+func NewError(message string, code string, status int64) RestError {
+	return &restError{
+		RMessage: message,
+		RStatus:  status,
+		RCode:    code,
+	}
+}
