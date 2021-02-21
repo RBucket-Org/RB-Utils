@@ -1,7 +1,12 @@
 package rest_errors
 
-import "net/http"
+import (
+	"encoding/json"
+	"errors"
+	"net/http"
+)
 
+// RestError : this hold the signature of the function
 type RestError interface {
 	Message() string
 	Status() int64
@@ -26,7 +31,7 @@ func (re *restError) Code() string {
 	return re.RCode
 }
 
-//NewBadRequest : this method implements the bad request error
+//NewBadRequestError : this method implements the bad request error
 func NewBadRequestError(message string) RestError {
 	return &restError{
 		RMessage: message,
@@ -78,4 +83,13 @@ func NewError(message string, code string, status int64) RestError {
 		RStatus:  status,
 		RCode:    code,
 	}
+}
+
+//NewRestErrorFromBytes : creates the resterror domain by taking the paramter as a slice of bytes
+func NewRestErrorFromBytes(byte []byte) (RestError, error) {
+	var apiErr restError
+	if err := json.Unmarshal(byte, &apiErr); err != nil {
+		return nil, errors.New("Invalid json")
+	}
+	return &apiErr, nil
 }
