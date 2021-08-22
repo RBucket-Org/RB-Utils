@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	// utils\mysql_errors\mysql_errors.go
+	"github.com/RBucket-Org/RB-Utils/utils/mysql_errors"
 )
 
 // RestError : this hold the signature of the function
@@ -31,8 +34,26 @@ func (re *restError) Code() string {
 	return re.RCode
 }
 
+func databaseErr(err error) RestError {
+	databaseErr := mysql_errors.DatabaseErrorHandler(err)
+	if databaseErr.Code() != "not_mysql_error" {
+		return &restError{
+			RMessage: databaseErr.Message(),
+			RStatus:  databaseErr.Status(),
+			RCode:    databaseErr.Code(),
+		}
+	}
+
+	return nil
+}
+
 //NewBadRequestError : this method implements the bad request error
-func NewBadRequestError(message string) RestError {
+func NewBadRequestError(message string, err error) RestError {
+	//check mysql error
+	if sqlErr := databaseErr(err); sqlErr != nil {
+		return sqlErr
+	}
+	//final
 	return &restError{
 		RMessage: message,
 		RStatus:  http.StatusBadRequest,
@@ -41,7 +62,12 @@ func NewBadRequestError(message string) RestError {
 }
 
 //NewNotFoundError : this method implements the not found error
-func NewNotFoundError(message string) RestError {
+func NewNotFoundError(message string, err error) RestError {
+	//check mysql error
+	if sqlErr := databaseErr(err); sqlErr != nil {
+		return sqlErr
+	}
+	//final
 	return &restError{
 		RMessage: message,
 		RStatus:  http.StatusNotFound,
@@ -50,7 +76,12 @@ func NewNotFoundError(message string) RestError {
 }
 
 //NewInternalServerError : this method implements the internal server error
-func NewInternalServerError(message string) RestError {
+func NewInternalServerError(message string, err error) RestError {
+	//check mysql error
+	if sqlErr := databaseErr(err); sqlErr != nil {
+		return sqlErr
+	}
+	//final
 	return &restError{
 		RMessage: message,
 		RStatus:  http.StatusInternalServerError,
@@ -59,7 +90,12 @@ func NewInternalServerError(message string) RestError {
 }
 
 //NewUnauthorizedError : this method implements the unauthorized error
-func NewUnauthorizedError(message string) RestError {
+func NewUnauthorizedError(message string, err error) RestError {
+	//check mysql error
+	if sqlErr := databaseErr(err); sqlErr != nil {
+		return sqlErr
+	}
+	//final
 	return &restError{
 		RMessage: message,
 		RStatus:  http.StatusUnauthorized,
@@ -70,14 +106,19 @@ func NewUnauthorizedError(message string) RestError {
 //TokenExpired : this will return when the token get expired
 func TokenExpired() RestError {
 	return &restError{
-		RMessage: "Token Expired",
+		RMessage: "token expired",
 		RStatus:  http.StatusExpectationFailed,
 		RCode:    "token_expired",
 	}
 }
 
 //NewError : this will creates the New Error
-func NewError(message string, code string, status int64) RestError {
+func NewError(message string, code string, status int64, err error) RestError {
+	//check mysql error
+	if sqlErr := databaseErr(err); sqlErr != nil {
+		return sqlErr
+	}
+	//final
 	return &restError{
 		RMessage: message,
 		RStatus:  status,
@@ -89,7 +130,7 @@ func NewError(message string, code string, status int64) RestError {
 func NewRestErrorFromBytes(byte []byte) (RestError, error) {
 	var apiErr restError
 	if err := json.Unmarshal(byte, &apiErr); err != nil {
-		return nil, errors.New("Invalid json")
+		return nil, errors.New("invalid json")
 	}
 	return &apiErr, nil
 }
