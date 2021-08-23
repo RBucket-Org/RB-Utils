@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/RBucket-Org/RB-Utils/utils/rest_errors"
 	mysql "github.com/go-mysql/errors"
 
 	"github.com/VividCortex/mysqlerr"
@@ -16,9 +17,9 @@ type MysqlError interface {
 }
 
 type mysqlError struct {
-	MEMessage string
-	MEStatus  int64
-	MECode    string
+	MEMessage string `json:"message"`
+	MECode    string `json:"code"`
+	MEStatus  int64  `json:"status"`
 }
 
 func (me *mysqlError) Message() string {
@@ -33,7 +34,7 @@ func (me *mysqlError) Code() string {
 	return me.MECode
 }
 
-func DatabaseErrorHandler(err error) MysqlError {
+func databaseErrorHandler(err error) MysqlError {
 	if ok, mysqlErr := mysql.Error(err); ok { //if it is the [MYSQL ERROR]
 		switch mysqlErr {
 		case mysql.ErrCannotConnect: //check if it is a connection error
@@ -60,17 +61,25 @@ func DatabaseErrorHandler(err error) MysqlError {
 				MEStatus:  http.StatusConflict,
 				MECode:    "duplicate_data",
 			}
-		}
-
-		//get the error code
-		errorNumber := mysql.MySQLErrorCode(mysqlErr)
-		if errorNumber == mysqlerr.ER_DUP_ENTRY {
-			return &mysqlError{
-				MEMessage: "same value or value already existed",
-				MEStatus:  http.StatusConflict,
-				MECode:    "duplicate_data",
+		default:
+			{
+				//get the error code
+				errorNumber := mysql.MySQLErrorCode(mysqlErr)
+				if errorNumber == mysqlerr.ER_DUP_ENTRY {
+					return &mysqlError{
+						MEMessage: "same value or value already existed",
+						MEStatus:  http.StatusConflict,
+						MECode:    "duplicate_data",
+					}
+				}
+				return &mysqlError{
+					MEMessage: mysqlErr.Error(),
+					MEStatus:  http.StatusInternalServerError,
+					MECode:    "internal_server_error",
+				}
 			}
 		}
+
 	}
 
 	//if it is not the [MYSQL ERROR]
@@ -79,4 +88,10 @@ func DatabaseErrorHandler(err error) MysqlError {
 		MEStatus:  http.StatusInternalServerError,
 		MECode:    "not_mysql_error",
 	}
+}
+
+func DatabaseErr(err error) rest_errors.RestError {
+	databaseErr := databaseErrorHandler(err)
+
+	return databaseErr
 }
