@@ -86,7 +86,7 @@ func databaseErrorHandler(err error) MysqlError {
 	return &mysqlError{
 		MEMessage: err.Error(),
 		MEStatus:  http.StatusInternalServerError,
-		MECode:    "not_mysql_error",
+		MECode:    "internal_server_error",
 	}
 }
 
