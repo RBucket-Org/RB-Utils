@@ -35,59 +35,58 @@ func (me *mysqlError) Code() string {
 }
 
 func databaseErrorHandler(err error) MysqlError {
-	if ok, mysqlErr := mysql.Error(err); ok { //if it is the [MYSQL ERROR]
-		switch mysqlErr {
-		case mysql.ErrCannotConnect: //check if it is a connection error
-			return &mysqlError{
-				MEMessage: mysqlErr.Error(),
-				MEStatus:  http.StatusRequestTimeout,
-				MECode:    "cannot_connect",
+	_, mysqlErr := mysql.Error(err)
+	switch mysqlErr {
+	case mysql.ErrCannotConnect: //check if it is a connection error
+		return &mysqlError{
+			MEMessage: mysqlErr.Error(),
+			MEStatus:  http.StatusRequestTimeout,
+			MECode:    "cannot_connect",
+		}
+	case sql.ErrNoRows: //no data present
+		return &mysqlError{
+			MEMessage: "data not found",
+			MEStatus:  http.StatusNotFound,
+			MECode:    "no_data",
+		}
+	case mysql.ErrConnLost: //database connection lost
+		return &mysqlError{
+			MEMessage: mysqlErr.Error(),
+			MEStatus:  http.StatusInternalServerError,
+			MECode:    "connection_lost",
+		}
+	case mysql.ErrDupeKey: //same value or duplicate value
+		return &mysqlError{
+			MEMessage: "same value or value already existed",
+			MEStatus:  http.StatusConflict,
+			MECode:    "duplicate_data",
+		}
+	default:
+		{
+			//get the error code
+			errorNumber := mysql.MySQLErrorCode(mysqlErr)
+			if errorNumber == mysqlerr.ER_DUP_ENTRY {
+				return &mysqlError{
+					MEMessage: "same value or value already existed",
+					MEStatus:  http.StatusConflict,
+					MECode:    "duplicate_data",
+				}
 			}
-		case sql.ErrNoRows: //no data present
-			return &mysqlError{
-				MEMessage: "data not found",
-				MEStatus:  http.StatusNotFound,
-				MECode:    "no_data",
-			}
-		case mysql.ErrConnLost: //database connection lost
 			return &mysqlError{
 				MEMessage: mysqlErr.Error(),
 				MEStatus:  http.StatusInternalServerError,
-				MECode:    "connection_lost",
-			}
-		case mysql.ErrDupeKey: //same value or duplicate value
-			return &mysqlError{
-				MEMessage: "same value or value already existed",
-				MEStatus:  http.StatusConflict,
-				MECode:    "duplicate_data",
-			}
-		default:
-			{
-				//get the error code
-				errorNumber := mysql.MySQLErrorCode(mysqlErr)
-				if errorNumber == mysqlerr.ER_DUP_ENTRY {
-					return &mysqlError{
-						MEMessage: "same value or value already existed",
-						MEStatus:  http.StatusConflict,
-						MECode:    "duplicate_data",
-					}
-				}
-				return &mysqlError{
-					MEMessage: mysqlErr.Error(),
-					MEStatus:  http.StatusInternalServerError,
-					MECode:    "internal_server_error",
-				}
+				MECode:    "internal_server_error",
 			}
 		}
 
 	}
 
-	//if it is not the [MYSQL ERROR]
-	return &mysqlError{
-		MEMessage: err.Error(),
-		MEStatus:  http.StatusInternalServerError,
-		MECode:    "internal_server_error",
-	}
+	// //if it is not the [MYSQL ERROR]
+	// return &mysqlError{
+	// 	MEMessage: err.Error(),
+	// 	MEStatus:  http.StatusInternalServerError,
+	// 	MECode:    "internal_server_error",
+	// }
 }
 
 func DatabaseErr(err error) rest_errors.RestError {
