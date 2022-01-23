@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/RBucket-Org/RB-Utils/utils/rest_errors"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -19,7 +19,7 @@ type JwtClaim struct {
 
 type validate func (token string, secret string) (*JwtClaim, rest_errors.RestError)
 
-func ProtectedMiddleWare(extractionKey string, accessKey string, validateToken validate, sugarLogger *zap.SugaredLogger) HandleMiddleWare {
+func ProtectedMiddleWare(extractionKey string, accessKey string, validateToken validate, sugarLogger *zap.SugaredLogger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//get the auth token from the header of the URI
 		sugarLogger.Debugf("authorization of the API starts")

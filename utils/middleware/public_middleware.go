@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func PublicMiddleWare(extractionKey string, publicAuthKey string, sugarLogger *zap.SugaredLogger) HandleMiddleWare {
+func PublicMiddleWare(extractionKey string, publicAuthKey string, sugarLogger *zap.SugaredLogger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//get the auth token from the header of the URI
 		clientToken := c.Request.Header.Get("Authorization")
