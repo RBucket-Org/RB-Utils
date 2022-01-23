@@ -5,21 +5,21 @@ import (
 	"strings"
 
 	"github.com/RBucket-Org/RB-Utils/utils/rest_errors"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"go.uber.org/zap"
 )
 
 type JwtClaim struct {
-	UserID int64
-	DeviceID int64
+	UserID      int64
+	DeviceID    int64
 	IdentityKey string
 	jwt.StandardClaims
 }
 
-type validate func (token string, secret string) (*JwtClaim, rest_errors.RestError)
+type Validate func(token string, secret string) (*JwtClaim, rest_errors.RestError)
 
-func ProtectedMiddleWare(extractionKey string, accessKey string, validateToken validate, sugarLogger *zap.SugaredLogger) gin.HandlerFunc {
+func ProtectedMiddleWare(extractionKey string, accessKey string, validateToken Validate, sugarLogger *zap.SugaredLogger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//get the auth token from the header of the URI
 		sugarLogger.Debugf("authorization of the API starts")
@@ -60,7 +60,7 @@ func ProtectedMiddleWare(extractionKey string, accessKey string, validateToken v
 		c.Set("user_id", claims.UserID)
 		c.Set("device_id", claims.DeviceID)
 		c.Set("identity_key", claims.IdentityKey)
-		
+
 		//execute the next handler
 		c.Next()
 	}
