@@ -41,7 +41,7 @@ func (mv *MiddlewareValue) GetMiddlewareValue(ctx *gin.Context) rest_errors.Rest
 	}
 	fmt.Printf("userID:%s\n, deviceID:%s\n, identityKey:%s\n, type:%s\n", userID, deviceID, identityKey, middleWareType)
 
-	mv.UserID = int64(userID.(int))
+	mv.UserID = userID.(int64)
 	mv.DeviceID = deviceID.(string)
 	mv.IdentityKey = identityKey.(string)
 	mv.MiddlewareType = middleWareType.(MiddlewareType)
