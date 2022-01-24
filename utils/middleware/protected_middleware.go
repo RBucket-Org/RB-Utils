@@ -10,6 +10,14 @@ import (
 	"go.uber.org/zap"
 )
 
+type MiddlewareType string
+
+const (
+	Protected MiddlewareType = "protected"
+	Public    MiddlewareType = "public"
+	Private   MiddlewareType = "private"
+)
+
 type JwtClaim struct {
 	UserID      int64
 	DeviceID    int64
@@ -57,6 +65,7 @@ func ProtectedMiddleWare(extractionKey string, accessKey string, validateToken V
 
 		//set the userID
 		sugarLogger.Infof("getting the parsed ID from token for further validation")
+		c.Set("middleware_type", Protected)
 		c.Set("user_id", claims.UserID)
 		c.Set("device_id", claims.DeviceID)
 		c.Set("identity_key", claims.IdentityKey)

@@ -8,10 +8,18 @@ import (
 
 	"github.com/RBucket-Org/RB-Utils/utils/rest_errors"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"go.uber.org/zap"
 )
 
-func PublicMiddleWare(extractionKey string, publicAuthKey string, sugarLogger *zap.SugaredLogger) gin.HandlerFunc {
+type PublicClaim struct {
+	Key string
+	jwt.RegisteredClaims
+}
+
+type PublicValidate func(token string, secret string) (*PublicClaim, rest_errors.RestError)
+
+func PublicMiddleWare(extractionKey string, restKey string, publicAuthKey string, validateToken PublicValidate, sugarLogger *zap.SugaredLogger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//get the auth token from the header of the URI
 		clientToken := c.Request.Header.Get("Authorization")
@@ -36,8 +44,17 @@ func PublicMiddleWare(extractionKey string, publicAuthKey string, sugarLogger *z
 			return
 		}
 
+		//validate the token
+		claims, err := validateToken(clientToken, restKey)
+		if err != nil {
+			sugarLogger.Errorf(err.Message())
+			c.JSON(int(err.Status()), err)
+			c.Abort()
+			return
+		}
+
 		hash := sha512.New()
-		hash.Write([]byte(clientToken))
+		hash.Write([]byte(claims.Key))
 		val := hex.EncodeToString(hash.Sum(nil))
 		//get the public auth key
 		generateFromAuthKey := val
@@ -50,6 +67,7 @@ func PublicMiddleWare(extractionKey string, publicAuthKey string, sugarLogger *z
 			return
 		}
 
+		c.Set("middleware_type", Public)
 		c.Next()
 	}
 }
