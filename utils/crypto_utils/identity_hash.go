@@ -11,14 +11,14 @@ var (
 )
 
 type identityHash interface {
-	GenerateSalt(salt string) ([]byte, error)
+	GenerateSalt(salt string) []byte
 	GenerateIdentityKey(key string, salt []byte) string
 	DoMatch(identityKey string, currentKey string, salt []byte) bool
 }
 
 type identity struct{}
 
-func (i *identity) GenerateSalt(salt string) ([]byte, error) {
+func (i *identity) GenerateSalt(salt string) []byte {
 	// convert the slice of the byte
 	val := []byte(salt)
 	//make the additional salt of the given salt size
@@ -27,7 +27,7 @@ func (i *identity) GenerateSalt(salt string) ([]byte, error) {
 	//append both the salts to create the new salt value
 	finalSaltVal := append(val, addVal...)
 
-	return finalSaltVal, nil
+	return finalSaltVal
 }
 
 func (i *identity) GenerateIdentityKey(key string, salt []byte) string {
