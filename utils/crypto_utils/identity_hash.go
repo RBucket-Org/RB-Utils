@@ -1,13 +1,12 @@
 package crypto_utils
 
 import (
-	"crypto/rand"
 	"crypto/sha512"
 	"encoding/base64"
 )
 
 var (
-	saltSize = 16
+	saltSize                  = 16
 	IdentityHash identityHash = &identity{}
 )
 
@@ -27,11 +26,6 @@ func (i *identity) GenerateSalt(salt string) ([]byte, error) {
 
 	//append both the salts to create the new salt value
 	finalSaltVal := append(val, addVal...)
-
-	//read the rand salt
-	if _, err := rand.Read(finalSaltVal); err != nil {
-		return nil, err
-	}
 
 	return finalSaltVal, nil
 }
