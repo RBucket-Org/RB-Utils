@@ -68,6 +68,9 @@ func PublicMiddleWare(extractionKey string, restKey string, publicAuthKey string
 		}
 
 		c.Set("middleware_type", Public)
+		c.Set("user_id", 0)
+		c.Set("device_id", "")
+		c.Set("identity_key", "")
 		c.Next()
 	}
 }

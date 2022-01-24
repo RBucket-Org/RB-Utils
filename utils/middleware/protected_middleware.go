@@ -20,7 +20,7 @@ const (
 
 type JwtClaim struct {
 	UserID      int64
-	DeviceID    int64
+	DeviceID    string
 	IdentityKey string
 	jwt.StandardClaims
 }
