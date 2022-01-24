@@ -39,7 +39,7 @@ func (mv *MiddlewareValue) GetMiddlewareValue(ctx *gin.Context) rest_errors.Rest
 		err := rest_errors.NewBadRequestError("token is invalid because the identity key is not valid")
 		return err
 	}
-	fmt.Printf("userID:%s\n, deviceID:%s\n, identityKey:%s\n, type:%s\n", userID, deviceID, identityKey, middleWareType)
+	fmt.Printf("userID:%d\n, deviceID:%s\n, identityKey:%s\n, type:%s\n", userID, deviceID, identityKey, middleWareType)
 
 	mv.UserID = userID.(int64)
 	mv.DeviceID = deviceID.(string)
