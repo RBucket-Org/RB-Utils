@@ -61,7 +61,6 @@ func PublicMiddleWare(extractionKey string, restKey string, validateToken Public
 			c.Abort()
 			return
 		}
-
 		c.Set("middleware_type", Public)
 		c.Set("user_id", int64(0))
 		c.Set("device_id", "")
