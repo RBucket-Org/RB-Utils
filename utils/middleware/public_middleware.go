@@ -19,7 +19,7 @@ type PublicClaim struct {
 
 type PublicValidate func(token string, secret string) (*PublicClaim, rest_errors.RestError)
 
-func PublicMiddleWare(extractionKey string, restKey string, publicAuthKey string, validateToken PublicValidate, sugarLogger *zap.SugaredLogger) gin.HandlerFunc {
+func PublicMiddleWare(extractionKey string, restKey string, validateToken PublicValidate, sugarLogger *zap.SugaredLogger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//get the auth token from the header of the URI
 		clientToken := c.Request.Header.Get("Authorization")
@@ -54,7 +54,7 @@ func PublicMiddleWare(extractionKey string, restKey string, publicAuthKey string
 		}
 
 		saltByte := crypto_utils.IdentityHash.GenerateSalt(extractionKey)
-		if !crypto_utils.IdentityHash.DoMatch(claims.Key, fmt.Sprintf("%s%s", extractionKey, publicAuthKey), saltByte) {
+		if !crypto_utils.IdentityHash.DoMatch(claims.Key, fmt.Sprintf("%s%s", extractionKey, restKey), saltByte) {
 			sugarLogger.Errorf("invalid public auth key")
 			emptyAuth := rest_errors.NewError("invalid public auth key", "invalid_key", http.StatusBadRequest)
 			c.JSON(int(emptyAuth.Status()), emptyAuth)
