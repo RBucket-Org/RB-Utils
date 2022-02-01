@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"crypto/sha512"
-	"encoding/hex"
+	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/RBucket-Org/RB-Utils/utils/crypto_utils"
 	"github.com/RBucket-Org/RB-Utils/utils/rest_errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -53,13 +53,9 @@ func PublicMiddleWare(extractionKey string, restKey string, publicAuthKey string
 			return
 		}
 
-		hash := sha512.New()
-		hash.Write([]byte(claims.Key))
-		val := hex.EncodeToString(hash.Sum(nil))
-		//get the public auth key
-		generateFromAuthKey := val
+		saltByte := crypto_utils.IdentityHash.GenerateSalt(extractionKey)
 
-		if generateFromAuthKey != publicAuthKey {
+		if !crypto_utils.IdentityHash.DoMatch(claims.Key, fmt.Sprintf("%s%s", extractionKey, publicAuthKey), saltByte) {
 			sugarLogger.Errorf("invalid public auth key")
 			emptyAuth := rest_errors.NewError("invalid public auth key", "invalid_key", http.StatusBadRequest)
 			c.JSON(int(emptyAuth.Status()), emptyAuth)

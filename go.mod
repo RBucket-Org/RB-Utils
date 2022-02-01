@@ -6,9 +6,9 @@ require (
 	github.com/VividCortex/mysqlerr v1.0.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-mysql/errors v0.0.0-20180603193453-03314bea68e0
+	github.com/golang-jwt/jwt/v4 v4.2.0
+	go.uber.org/zap v1.20.0
 )
-
-require github.com/golang-jwt/jwt/v4 v4.2.0
 
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
@@ -25,8 +25,7 @@ require (
 	github.com/ugorji/go/codec v1.2.6 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	go.uber.org/zap v1.20.0
-	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce // indirect
+	golang.org/x/crypto v0.0.0-20220131195533-30dcbda58838 // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
