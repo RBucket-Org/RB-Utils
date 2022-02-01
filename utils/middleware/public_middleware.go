@@ -54,7 +54,6 @@ func PublicMiddleWare(extractionKey string, restKey string, publicAuthKey string
 		}
 
 		saltByte := crypto_utils.IdentityHash.GenerateSalt(extractionKey)
-
 		if !crypto_utils.IdentityHash.DoMatch(claims.Key, fmt.Sprintf("%s%s", extractionKey, publicAuthKey), saltByte) {
 			sugarLogger.Errorf("invalid public auth key")
 			emptyAuth := rest_errors.NewError("invalid public auth key", "invalid_key", http.StatusBadRequest)
