@@ -38,6 +38,7 @@ type EnvInterface interface {
 	GetLocalHTML() (string, error)
 	GetBaseURI() (string, error)
 	GetUSERBaseURI() (string, error)
+	GetNotificationAPIKey() (string, error)
 
 	//MIDDLEWARE ENV
 	GetProtectedTokenExtractionKey() (string, error)
