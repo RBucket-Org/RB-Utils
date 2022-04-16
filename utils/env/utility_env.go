@@ -67,3 +67,16 @@ func (ef *envfetch) GetUSERBaseURI() (string, error) {
 		return key, nil
 	}
 }
+
+func (ef *envfetch) GetNotificationAPIKey() (string, error) {
+	key, err := read(notificationAPIKeyFile())
+	if err != nil {
+		return "", err
+	}
+
+	if len(key) == 0 {
+		return notificationAPIKey(), nil
+	} else {
+		return key, nil
+	}
+}

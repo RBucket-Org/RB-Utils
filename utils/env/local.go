@@ -28,3 +28,4 @@ func localHTMLPath() string   { return os.Getenv(LOCAL_HTML) }
 func localAssetsPath() string { return os.Getenv(LOCAL_ASSETS) }
 func baseURI() string         { return os.Getenv(URI) }
 func baseUserURI() string     { return os.Getenv(USER_URI) }
+func notificationAPIKey() string     { return os.Getenv(NOTIFICATION_API_KEY) }

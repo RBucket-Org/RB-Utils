@@ -23,6 +23,7 @@ const (
 	MYSQL_USERNAME_FILE                 = "MYSQL_USERNAME_FILE"
 	MYSQL_HOST_FILE                     = "MYSQL_HOST_FILE"
 	MYSQL_PORT_FILE                     = "MYSQL_PORT_FILE"
+	NOTIFICATION_API_KEY_FILE           = "NOTIFICATION_API_KEY_FILE"
 )
 
 //LOCALS
@@ -47,4 +48,5 @@ const (
 	MYSQL_USERNAME                 = "MYSQL_USERNAME"
 	MYSQL_HOST                     = "MYSQL_HOST"
 	MYSQL_PORT                     = "MYSQL_PORT"
+	NOTIFICATION_API_KEY           = "NOTIFICATION_API_KEY"
 )
