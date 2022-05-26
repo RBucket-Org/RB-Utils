@@ -1,4 +1,4 @@
-package env
+package constants
 
 //ENVIROMENT VARIABLE CONSTANTS
 //SECRETS
